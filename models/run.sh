@@ -1,0 +1,1 @@
+hf download openai-community/gpt2 model.safetensors --local-dir ./gpt2
