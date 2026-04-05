@@ -4,6 +4,10 @@
 #include <fstream>
 #include <memory>
 #include <cstring>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
 
 namespace naida
 {
@@ -27,7 +31,8 @@ std::vector<std::byte> WeightLoader::load_layer(const std::string_view &name)
 
     std::memcpy(json_buf.data(), buf.data() + 8, len_header);
 
-    printf("json: %s\n", json_buf.data());
+    auto js = json::parse(json_buf);
+    printf("%s\n", js.dump(4).data());
 
 
     return buf;
