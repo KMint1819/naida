@@ -5,6 +5,11 @@
 
 namespace naida
 {
+// .safetensors:
+// 8 bytes: uint64: size of header
+// N bytes: json header
+// rest of file: raw data
+
 WeightLoader::WeightLoader(const fs::path &path): weight_path(path) {}
 std::vector<std::byte> WeightLoader::load_layer(const std::string_view &name)
 {
