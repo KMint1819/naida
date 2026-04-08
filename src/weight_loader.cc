@@ -33,8 +33,6 @@ std::vector<std::byte> WeightLoader::load_layer(const std::string_view &name)
 
     auto js = json::parse(json_buf);
     printf("%s\n", js.dump(4).data());
-
-
     return buf;
 }
 } // namespace naida
