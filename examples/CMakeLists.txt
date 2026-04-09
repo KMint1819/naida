@@ -7,7 +7,7 @@ target_link_libraries(app
 )
 
 target_link_libraries(app 
-    PRIVATE naidalib
+    PRIVATE naida
 )
 
 target_include_directories(app 

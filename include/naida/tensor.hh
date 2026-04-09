@@ -28,6 +28,7 @@ public:
     size_t total_size() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Shape& shape);
+    friend bool operator==(const Shape& lhs, const Shape& rhs);
 
 private:
     std::vector<size_t> vec;
@@ -72,10 +73,12 @@ public:
     Tensor(const Shape& shape, const DType& dtype = DType::FLOAT32);
 
     friend std::ostream& operator<<(std::ostream& os, const Tensor& tensor);
+    Shape shape() const;
+    const std::byte* data() const;
 
 private:
     std::vector<std::byte> buf;
-    Shape shape;
+    Shape shape_;
     DType dtype;
 };
 

@@ -12,6 +12,10 @@ void Block::register_block(const std::string& str, std::unique_ptr<Block> block)
 { blocks.emplace(str, std::move(block)); }
 
 
+Identity::Identity() {}
+std::vector<Tensor> Identity::forward(const std::vector<Tensor>& inputs)
+{ return inputs; }
+
 Gemm::Gemm(size_t in_dims, size_t out_dims, DType dtype)
 {
     std::vector<size_t> shape = { in_dims, out_dims };

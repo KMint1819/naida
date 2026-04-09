@@ -7,6 +7,7 @@ add_executable(
 target_link_libraries(hello_test
     PRIVATE GTest::gtest_main
     PRIVATE fmt::fmt
+    PRIVATE naida
 )
 target_include_directories(hello_test
     PRIVATE ${PROJECT_SOURCE_DIR}/include

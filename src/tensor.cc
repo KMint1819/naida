@@ -79,24 +79,40 @@ std::vector<std::byte> random_weights(const Shape& shape, const DType& dtype)
 }
 
 Tensor::Tensor(const std::vector<std::byte>& buf, const Shape& shape, const DType& dtype)
-    : buf(buf), shape(shape), dtype(dtype)
+    : buf(buf), shape_(shape), dtype(dtype)
 {
 }
 Tensor::Tensor(const Shape& shape, const DType& dtype): Tensor(random_weights(shape, dtype), shape, dtype) {}
 
 std::ostream& operator<<(std::ostream& os, const Tensor& tensor)
 {
-    os << dtype_str(tensor.dtype) << " tensor (" << tensor.shape << ")\n";
+    os << dtype_str(tensor.dtype) << " tensor (" << tensor.shape_ << ")\n";
 
     if (tensor.dtype == DType::FLOAT32)
     {
         const float* ptr = reinterpret_cast<float*>(const_cast<std::byte*>(tensor.buf.data()));
         size_t offset = 0;
-        print_vector(os, ptr, tensor.shape, 0, offset);
+        print_vector(os, ptr, tensor.shape_, 0, offset);
     }
     else
         throw std::runtime_error("Type is not supported");
 
     return os;
 }
+bool operator==(const Shape& lhs, const Shape& rhs)
+{
+    if (lhs.size() != rhs.size())
+        return false;
+    if (lhs.total_size() != rhs.total_size())
+        return false;
+
+    for (int i = 0; i < lhs.size(); i++)
+        if (lhs[i] != rhs[i])
+            return false;
+    return true;
+}
+Shape Tensor::shape() const
+{ return shape_; };
+const std::byte* Tensor::data() const
+{ return buf.data(); }
 } // namespace naida
