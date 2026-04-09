@@ -18,15 +18,15 @@ public:
     using iterator = std::vector<size_t>::iterator;
     using const_iterator = std::vector<size_t>::const_iterator;
 
-    Shape(const std::vector<size_t>& vec): vec(vec)
+    explicit Shape(const std::initializer_list<size_t>& list): vec(list)
     {
+        printf("vec size: %d\n", vec.size());
         size_t tmp = vec.size() > 0 ? 1 : 0;
 
         for (const size_t sz : vec)
             tmp *= sz;
         sz = tmp;
     }
-    Shape(const std::initializer_list<size_t>& list): vec(list) {}
 
     iterator begin()
     { return vec.begin(); }
@@ -52,7 +52,9 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Shape& shape)
     {
-        os << fmt::format("{{}}", shape.vec);
+        fmt::print("shape vec size: {}\n", shape.vec.size());
+        fmt::print("shape vec: {}\n", shape.vec);
+        os << fmt::format("{}", shape.vec);
         return os;
     }
 
@@ -108,27 +110,32 @@ std::ostream& print_vector(std::ostream& os, const T* ptr, const Shape& shape, c
 
 std::vector<std::byte> random_weights(const Shape& shape, const DType& dtype)
 {
+    printf("randoming\n");
     std::vector<std::byte> buf;
+    printf("%d\n", shape.total_size() * dtype_size(dtype));
     buf.reserve(shape.total_size() * dtype_size(dtype));
 
     static std::random_device dev;
     static std::mt19937 rng(dev());
-    std::uniform_int_distribution<std::mt19937::result_type> dist(0, 255);
+    std::uniform_int_distribution<std::mt19937::result_type> dist(0, 256);
     for (int i = 0; i < shape.total_size() * dtype_size(dtype); i++)
     {
         buf.push_back(std::byte { static_cast<unsigned char>(dist(rng)) });
     }
+    printf("randoming out\n");
     return buf;
 }
 
 class Tensor
 {
 public:
-    Tensor(const std::vector<std::byte>& buf, const Shape& shape, const DType& dtype)
+    Tensor(const std::vector<std::byte>& buf, const Shape& shape, const DType& dtype = DType::FLOAT32)
         : buf(buf), shape(shape), dtype(dtype)
     {
     }
-    Tensor(const Shape& shape, const DType& dtype): Tensor(random_weights(shape, dtype), shape, dtype) {}
+    Tensor(const Shape& shape, const DType& dtype = DType::FLOAT32): Tensor(random_weights(shape, dtype), shape, dtype)
+    {
+    }
 
     friend std::ostream& operator<<(std::ostream& os, const Tensor& tensor)
     {
