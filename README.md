@@ -11,7 +11,6 @@ docker run --rm -it --gpus all -v $(pwd):/workspace naida bash
 
 - weights loader
 - model structure
-- tests
 
 
 ## Main goals
@@ -20,4 +19,7 @@ docker run --rm -it --gpus all -v $(pwd):/workspace naida bash
 - quantization
 - multidevice
 - moe
+
+## Improvements
+- cuda graph
 
