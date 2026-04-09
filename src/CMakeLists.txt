@@ -9,6 +9,6 @@ target_include_directories(naidalib
     PRIVATE ${PROJECT_SOURCE_DIR}/3rdparty
 )
 target_link_libraries(naidalib 
-    PRIVATE nlohmann_json::nlohmann_json
+    PUBLIC nlohmann_json::nlohmann_json
     PUBLIC fmt::fmt
 )

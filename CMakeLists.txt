@@ -17,8 +17,15 @@ FetchContent_Declare(
   GIT_TAG        e69e5f977d458f2650bb346dadf2ad30c5320281) # 10.2.1
 FetchContent_MakeAvailable(fmt)
 
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+FetchContent_MakeAvailable(googletest)
+
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(examples)
 add_subdirectory(src)
+add_subdirectory(tests)
