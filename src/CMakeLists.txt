@@ -1,7 +1,7 @@
 add_library(naidalib 
     weight_loader.cc
     common.cc
-    layer.cc
+    block.cc
     tensor.cc
 )
 target_include_directories(naidalib 
