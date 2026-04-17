@@ -3,6 +3,7 @@ add_library(naida
     common.cc
     block.cc
     tensor.cc
+    tokenizer.cc
 )
 target_include_directories(naida 
     PRIVATE ${PROJECT_SOURCE_DIR}/include

@@ -19,6 +19,10 @@ docker run --rm -it --gpus all -v $(pwd):/workspace naida bash
 - quantization
 - multidevice
 - moe
+- faster than llama.cpp
+
+## Must-have
+- verification per step with torch gpt2
 
 ## Improvements
 - cuda graph

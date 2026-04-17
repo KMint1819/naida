@@ -5,7 +5,10 @@
 #include <vector>
 #include <random>
 
+#include <nlohmann/json.hpp>
 
+
+using nlohmann::json;
 namespace fs = std::filesystem;
 
 namespace naida

@@ -13,7 +13,7 @@ public:
 
     // virtual void load_weights(const WeightLoader& weight_loader);
     // virtual std::vector<std::byte> dump_weigths();
-    inline virtual ~Block() {}
+    virtual ~Block() {}
     virtual std::vector<Tensor> forward(const std::vector<Tensor>& inputs) = 0;
 
 protected:
@@ -27,7 +27,7 @@ class Identity final : public Block
 {
 public:
     explicit Identity();
-    inline ~Identity() override {};
+    ~Identity() override {};
 
     std::vector<Tensor> forward(const std::vector<Tensor>& inputs) override;
 };
@@ -36,7 +36,7 @@ class Gemm final : public Block
 {
 public:
     explicit Gemm(size_t in_dims, size_t out_dims, DType dtype = DType::FLOAT32);
-    inline ~Gemm() override {};
+    ~Gemm() override {};
 
     std::vector<Tensor> forward(const std::vector<Tensor>& inputs) override;
 };
