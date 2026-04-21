@@ -14,6 +14,8 @@ class Tokenizer
     //    |
     //    v
     // [37, 32, 88, 18, 17, 90]
+    using ByteToSymbol = std::array<std::string, 256>;
+    using SymbolToByte = std::unordered_map<std::string, uint8_t>;
 
 public:
     explicit Tokenizer(const fs::path&);
@@ -22,6 +24,8 @@ public:
 
 private:
     std::vector<std::string> pre_tokenize(const std::string&);
+    ByteToSymbol byte_to_symbol;
+    SymbolToByte symbol_to_byte;
 
     const std::regex pattern { R"('s|'t|'re|'ve|'m|'ll|'d| ?[A-Za-z]+| ?[0-9]+| ?[^\sA-Za-z0-9]+|\s+$|\s+)" };
 };

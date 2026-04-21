@@ -30,8 +30,9 @@ int main()
     // naida::Tensor out = model.forward({ tensor })[0];
     // fmt::print("Out:{}\n", out);
     naida::Tokenizer tokenizer("../models/gpt2/tokenizer.json");
-    const std::string query = "That's a good question!";
-    tokenizer.tokenize(query);
+    // tokenizer.tokenize(query);
+    // const std::string query = "我是你爸";
+    // fmt::print("{}\n", query.size());
 
 
     return 0;

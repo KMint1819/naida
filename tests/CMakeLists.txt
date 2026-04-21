@@ -10,6 +10,7 @@ target_link_libraries(hello_test
     PRIVATE naida
 )
 target_include_directories(hello_test
+    PRIVATE ${PROJECT_SOURCE_DIR}/src
     PRIVATE ${PROJECT_SOURCE_DIR}/include
     PRIVATE ${PROJECT_SOURCE_DIR}/3rdparty
 )
