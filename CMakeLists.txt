@@ -6,6 +6,13 @@ project(naida
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_BUILD_TYPE Debug)
 
+
+# Avoid warning about DOWNLOAD_EXTRACT_TIMESTAMP in CMake 3.24:
+# See https://cmake.org/cmake/help/latest/policy/CMP0135.html#policy:CMP0135
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
+  cmake_policy(SET CMP0135 NEW)
+endif()
+
 include(FetchContent)
 FetchContent_Declare(
     json 

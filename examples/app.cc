@@ -5,7 +5,6 @@
 #include "naida/block.hh"
 #include "naida/tokenizer.hh"
 #include "naida/weight_loader.hh"
-#include <boost/regex/icu.hpp>
 
 class MyModel : public naida::Block
 {
@@ -21,7 +20,8 @@ public:
 };
 void try_icu()
 {
-    boost::u32regex r = boost::make_u32regex("(?:\\A|.*\\\\)([^\\\\]+)");
+    boost::u32regex r =
+    boost::make_u32regex(R"('s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+)");
 
     boost::smatch what;
     if (boost::u32regex_match("/home/local", what, r))
@@ -44,10 +44,9 @@ int main()
     // MyModel model(3);
     // naida::Tensor out = model.forward({ tensor })[0];
     // fmt::print("Out:{}\n", out);
-    // naida::Tokenizer tokenizer("../models/gpt2/tokenizer.json");
-    // tokenizer.tokenize(query);
-    // const std::string query = "我是你爸";
+    naida::Tokenizer tokenizer("../models/gpt2/tokenizer.json");
+    const std::string query = "I'm learning LLM. 臺灣123!";
+    tokenizer.tokenize(query);
     // fmt::print("{}\n", query.size());
-    try_icu();
     return 0;
 }

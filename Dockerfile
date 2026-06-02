@@ -1,4 +1,3 @@
-
 FROM nvidia/cuda:12.9.0-cudnn-devel-ubuntu24.04
 WORKDIR /workspace
 
@@ -10,7 +9,8 @@ RUN apt update && apt install -y \
     git \
     cmake \
     build-essential \
-    vim
+    vim \
+    gdb
 
 RUN apt install -y \
     libicu-dev \

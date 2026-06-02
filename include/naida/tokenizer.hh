@@ -1,10 +1,13 @@
 #include <filesystem>
-#include <vector>
 #include <regex>
+#include <vector>
+#include "boost/regex/icu.hpp"
 
 namespace fs = std::filesystem;
 namespace naida
 {
+
+// Implementation of https://github.com/openai/gpt-2/blob/master/src/encoder.py
 class Tokenizer
 {
     // That's a good question.
@@ -18,15 +21,15 @@ class Tokenizer
     using SymbolToByte = std::unordered_map<std::string, uint8_t>;
 
 public:
-    explicit Tokenizer(const fs::path&);
-    std::vector<char> tokenize(const std::string&);
+    explicit Tokenizer(const fs::path &);
+    std::vector<char> tokenize(const std::string &);
     std::string detokenize(const char);
 
 private:
-    std::vector<std::string> pre_tokenize(const std::string&);
+    std::vector<std::string> pre_tokenize(const std::string &);
     ByteToSymbol byte_to_symbol;
     SymbolToByte symbol_to_byte;
 
-    const std::regex pattern { R"('s|'t|'re|'ve|'m|'ll|'d| ?[A-Za-z]+| ?[0-9]+| ?[^\sA-Za-z0-9]+|\s+$|\s+)" };
+    const boost::u32regex pattern;
 };
 } // namespace naida

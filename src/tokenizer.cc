@@ -50,6 +50,8 @@ std::string unicode_to_string_buffer(const uint32_t code_point)
 namespace naida
 {
 Tokenizer::Tokenizer(const fs::path& p)
+    : pattern { boost::make_u32regex(
+      R"('s|'t|'re|'ve|'m|'ll|'d| ?[[:L*:]]+| ?[[:N*:]]+| ?[^\s[:L*:][:N*:]]+|\s+(?!\S)|\s+)") }
 {
     std::ifstream ifs(p);
     json data = json::parse(ifs);
@@ -94,15 +96,17 @@ std::string Tokenizer::detokenize(const char) {}
 std::vector<std::string> Tokenizer::pre_tokenize(const std::string& input)
 {
     std::string s = input;
-    auto words_begin = std::sregex_iterator(input.begin(), input.end(), pattern);
-    auto words_end = std::sregex_iterator();
-    size_t num_found = std::distance(words_begin, words_end);
+    auto it = boost::make_u32regex_iterator(input, pattern);
+    auto end = boost::u32regex_iterator<std::string::const_iterator>();
+
+    size_t num_found = std::distance(it, {});
 
     std::vector<std::string> result;
     result.reserve(num_found);
 
-    for (auto it = words_begin; it != words_end; it++)
+    for (; it != end; it++)
     {
+        fmt::println("pushing {}", it->str());
         result.push_back(it->str());
     }
     return result;
