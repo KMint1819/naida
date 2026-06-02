@@ -2,6 +2,16 @@
 FROM nvidia/cuda:12.9.0-cudnn-devel-ubuntu24.04
 WORKDIR /workspace
 
-RUN curl -LsSf https://hf.co/cli/install.sh | bash
-RUN hf download openai-community/gpt2 model.safetensors
+RUN apt update && apt install -y \
+    curl \
+    python3.12 \
+    python3.12-venv \
+    python-is-python3 \
+    git \
+    cmake \
+    build-essential \
+    vim
 
+RUN apt install -y \
+    libicu-dev \
+    libboost-regex-dev

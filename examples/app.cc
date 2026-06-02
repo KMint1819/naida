@@ -2,10 +2,10 @@
 
 #include "fmt/format.h"
 #include "fmt/xchar.h"
-#include "naida/weight_loader.hh"
 #include "naida/block.hh"
 #include "naida/tokenizer.hh"
-
+#include "naida/weight_loader.hh"
+#include <boost/regex/icu.hpp>
 
 class MyModel : public naida::Block
 {
@@ -16,9 +16,24 @@ public:
         this->register_block("gemm0", std::move(gemm));
     }
     virtual ~MyModel() {}
-    virtual std::vector<naida::Tensor> forward(const std::vector<naida::Tensor>& inputs)
+    virtual std::vector<naida::Tensor> forward(const std::vector<naida::Tensor> &inputs)
     { return blocks["gemm0"]->forward(inputs); }
 };
+void try_icu()
+{
+    boost::u32regex r = boost::make_u32regex("(?:\\A|.*\\\\)([^\\\\]+)");
+
+    boost::smatch what;
+    if (boost::u32regex_match("/home/local", what, r))
+    {
+        // extract $1 as a std::string:
+        fmt::println("{}", what.str(1));
+    }
+    else
+    {
+        throw std::runtime_error("Invalid pathname");
+    }
+}
 int main()
 {
     // naida::WeightLoader weight_loader("../models/gpt2/model.safetensors");
@@ -29,11 +44,10 @@ int main()
     // MyModel model(3);
     // naida::Tensor out = model.forward({ tensor })[0];
     // fmt::print("Out:{}\n", out);
-    naida::Tokenizer tokenizer("../models/gpt2/tokenizer.json");
+    // naida::Tokenizer tokenizer("../models/gpt2/tokenizer.json");
     // tokenizer.tokenize(query);
     // const std::string query = "我是你爸";
     // fmt::print("{}\n", query.size());
-
-
+    try_icu();
     return 0;
 }

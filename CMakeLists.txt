@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(naida
-    LANGUAGES CXX
+    LANGUAGES CXX CUDA
 )
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_BUILD_TYPE Debug)
@@ -23,6 +23,11 @@ FetchContent_Declare(
   URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
 FetchContent_MakeAvailable(googletest)
+
+option(ENABLE_CUBLAS "Whether to use CUBLAS kernels")
+if(ENABLE_CUBLAS)
+  find_package(CUDAToolkit REQUIRED)
+endif()
 
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
