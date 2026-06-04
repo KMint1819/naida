@@ -10,8 +10,11 @@ RUN apt update && apt install -y \
     cmake \
     build-essential \
     vim \
-    gdb
+    gdb \
+    clangd \
+    clang-format
 
 RUN apt install -y \
     libicu-dev \
-    libboost-regex-dev
+    libboost-regex-dev \
+    libboost-hash-dev

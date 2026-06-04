@@ -1,6 +1,7 @@
 #include "naida/common.hh"
 #include "naida/tokenizer.hh"
 #include <fstream>
+#include <fmt/ranges.h>
 #include <fmt/format.h>
 
 namespace
@@ -49,29 +50,66 @@ std::string unicode_to_string_buffer(const uint32_t code_point)
 
 namespace naida
 {
-Tokenizer::Tokenizer(const fs::path& p)
+Tokenizer::Tokenizer(const fs::path& tokenizer_json_path, const fs::path& merges_path)
     : pattern { boost::make_u32regex(
       R"('s|'t|'re|'ve|'m|'ll|'d| ?[[:L*:]]+| ?[[:N*:]]+| ?[^\s[:L*:][:N*:]]+|\s+(?!\S)|\s+)") }
 {
-    std::ifstream ifs(p);
-    json data = json::parse(ifs);
+    // the linter error is because we're using pairs as a key for the merges. we need to provide a hash function for
+    // pair<char,char>. maybe use https://www.boost.org/doc/libs/latest/libs/container_hash/doc/html/hash.html
+    parse_tokenizer_json(tokenizer_json_path);
+    parse_merges(merges_path);
+    build_symbols_bytes();
+}
 
-    // construct byte to symbol:
+void Tokenizer::build_symbols_bytes()
+{
+    // !: 33
+    // ~: 126
+    // ¡: 161
+    // ¬: 172
+    // ®: 174
+    // ÿ: 255
     int counter = 0;
-    for (uint32_t c = 0; c < 256; c++)
+    for (int i = 0; i < 256; i++)
     {
         std::string s;
-        if ((c >= '!' && c <= '~') || (c >= '¡' && c <= '¬') || (c >= '®' && c <= 'ÿ'))
+        if ((i >= 33 && i <= 126) || (i >= 161 && i <= 172) || (i >= 174 && i <= 255))
         {
-            s.push_back(static_cast<char>(c));
+            s = unicode_to_string_buffer(i);
         }
         else
         {
-            // Push back the bytes of the codepoint
-            s = unicode_to_string_buffer(counter + 256);
+            s = unicode_to_string_buffer(256 + counter);
             counter++;
         }
-        byte_to_symbol[c] = s;
+        byte_to_symbol[i] = s;
+        symbol_to_id[s] = i;
+    }
+}
+
+void Tokenizer::parse_tokenizer_json(const fs::path& path)
+{
+    std::ifstream ifs(path);
+    json data = json::parse(ifs);
+}
+
+void Tokenizer::parse_merges(const fs::path& path)
+{
+    // merges.txt structure:
+    // #version: x.y
+    // a b
+    // c d
+    //...
+    std::ifstream ifs(path);
+    std::string a, b;
+
+    // get rid of the first version line
+    ifs >> a >> b;
+    uint32_t rank_count = 1;
+    while (ifs >> a >> b)
+    {
+        pair_ranks.insert({ SymbolPair { a, b }, rank_count });
+        rank_count++;
     }
 }
 
@@ -82,13 +120,53 @@ std::vector<char> Tokenizer::tokenize(const std::string& input)
     // 2.a Parse as bytes
     // 2.b Convert to unicode
     // 3. Start BPE
-    fmt::print("{}\n", input);
-    auto ans = pre_tokenize(input);
-    for (const std::string s : ans)
+    fmt::print("Tokenizing <{}>\n", input);
+    std::vector<char> ans;
+    auto pre_tokenized = pre_tokenize(input);
+    for (const std::string s : pre_tokenized)
     {
-        fmt::print("[{}] ", s);
+        fmt::print("Tokens for '{}': ", s);
+        std::vector<std::string> symbols;
+        for (const char ch : s)
+        {
+            std::string symbol = byte_to_symbol[ch];
+            symbols.push_back(symbol);
+        }
+        fmt::println("Symbols: <{}>", symbols);
+
+        std::vector<std::string> tokens = bpe(symbols);
+        for (const std::string token : tokens)
+        {
+            ans.push_back(static_cast<char>(symbol_to_id[token]));
+        }
     }
-    fmt::println("");
+    return ans;
+}
+std::vector<std::string> Tokenizer::bpe(const std::vector<std::string>& symbols)
+{
+    auto get_pairs = [](const std::vector<std::string>& x)
+    {
+        std::vector<SymbolPair> pairs;
+        std::string prev_symbol = x[0];
+        const int len = x.size();
+        for (int i = 1; i < len; i++)
+        {
+            pairs.push_back({ prev_symbol, x[i] });
+            prev_symbol = x[i];
+        }
+        return pairs;
+    };
+    std::vector<SymbolPair> pairs = get_pairs(symbols);
+    for (const auto& pair : pairs)
+    {
+        fmt::print("pair: <<{}> <{}>>, {} {}, ", pair.first, pair.second, symbol_to_id[pair.first],
+                   symbol_to_id[pair.second]);
+        if (pair_ranks.contains(pair))
+            fmt::println("rank {}", pair_ranks[pair]);
+        else
+            fmt::println("no rank");
+    }
+
     return {};
 }
 std::string Tokenizer::detokenize(const char) {}

@@ -44,7 +44,7 @@ int main()
     // MyModel model(3);
     // naida::Tensor out = model.forward({ tensor })[0];
     // fmt::print("Out:{}\n", out);
-    naida::Tokenizer tokenizer("../models/gpt2/tokenizer.json");
+    naida::Tokenizer tokenizer("../models/gpt2/tokenizer.json", "../models/gpt2/merges.txt");
     const std::string query = "I'm learning LLM. 臺灣123!";
     tokenizer.tokenize(query);
     // fmt::print("{}\n", query.size());

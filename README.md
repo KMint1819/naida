@@ -1,5 +1,8 @@
-# naida
-> No-AI CUDA
+# naida (No-AI CUDA)
+
+End to end LLM project that uses as less AI as possible, mostly for educational purposes. No AI agents, no AI searches. Every usage for AI has to be justified in [ai_record.md](./ai_record.md)
+
+> To clarify, this is not to discourage people from using AI. I use AI pretty much 100% of my time now during work, but feel like I'm learning less about the engineering details, which seems to be still worth understanding at least for now.  
 
 ## Prerequisite
 - `hf`: https://huggingface.co/docs/huggingface_hub/guides/cli
@@ -20,7 +23,7 @@ cmake ..
 make -j32
 ```
 
-## Teset
+## Test
 ```
 cd naida/build
 
@@ -41,4 +44,3 @@ cd naida/build
 
 ## Improvements
 - cuda graph
-
