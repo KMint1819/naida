@@ -16,7 +16,9 @@ public:
     }
     virtual ~MyModel() {}
     virtual std::vector<naida::Tensor> forward(const std::vector<naida::Tensor> &inputs)
-    { return blocks["gemm0"]->forward(inputs); }
+    {
+        return blocks["gemm0"]->forward(inputs);
+    }
 };
 void try_icu()
 {

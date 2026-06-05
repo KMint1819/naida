@@ -1,8 +1,10 @@
+#include "fmt/core.h"
 #include "naida/common.hh"
 #include "naida/tokenizer.hh"
 #include <fstream>
 #include <fmt/ranges.h>
 #include <fmt/format.h>
+#include <optional>
 
 namespace
 {
@@ -83,7 +85,6 @@ void Tokenizer::build_symbols_bytes()
             counter++;
         }
         byte_to_symbol[i] = s;
-        symbol_to_id[s] = i;
     }
 }
 
@@ -91,6 +92,17 @@ void Tokenizer::parse_tokenizer_json(const fs::path& path)
 {
     std::ifstream ifs(path);
     json data = json::parse(ifs);
+    json vocabs = data["model"]["vocab"];
+    for (auto& [key, value] : vocabs.items())
+    {
+        int num = static_cast<uint32_t>(value);
+        symbol_to_id[key] = num;
+        if (num >= id_to_symbol.size())
+        {
+            id_to_symbol.resize(num + 1);
+        }
+        id_to_symbol[num] = key;
+    }
 }
 
 void Tokenizer::parse_merges(const fs::path& path)
@@ -113,7 +125,7 @@ void Tokenizer::parse_merges(const fs::path& path)
     }
 }
 
-std::vector<char> Tokenizer::tokenize(const std::string& input)
+std::vector<uint32_t> Tokenizer::tokenize(const std::string& input)
 {
     // 1. Pre-tokenize
     // 2. For each token:
@@ -121,32 +133,46 @@ std::vector<char> Tokenizer::tokenize(const std::string& input)
     // 2.b Convert to unicode
     // 3. Start BPE
     fmt::print("Tokenizing <{}>\n", input);
-    std::vector<char> ans;
+    std::vector<uint32_t> ans;
     auto pre_tokenized = pre_tokenize(input);
     for (const std::string s : pre_tokenized)
     {
         fmt::print("Tokens for '{}': ", s);
         std::vector<std::string> symbols;
-        for (const char ch : s)
+        for (const uint8_t ch : s)
         {
+            fmt::println("ch: {}", ch);
             std::string symbol = byte_to_symbol[ch];
             symbols.push_back(symbol);
         }
-        fmt::println("Symbols: <{}>", symbols);
+        fmt::println("<{}>, ", symbols);
 
         std::vector<std::string> tokens = bpe(symbols);
+        fmt::println("After bpe: <{}>", tokens);
         for (const std::string token : tokens)
         {
-            ans.push_back(static_cast<char>(symbol_to_id[token]));
+            int id = static_cast<uint32_t>(symbol_to_id[token]);
+            fmt::print("{}, ", id);
+
+            ans.push_back(id);
         }
+        fmt::println("Done. {}", ans);
     }
+    fmt::print("Final answer:");
+    for (const auto id : ans)
+    {
+        fmt::print("{}", id_to_symbol[id]);
+    }
+    fmt::println("");
     return ans;
 }
-std::vector<std::string> Tokenizer::bpe(const std::vector<std::string>& symbols)
+std::vector<std::string> Tokenizer::bpe(std::vector<std::string> symbols)
 {
     auto get_pairs = [](const std::vector<std::string>& x)
     {
         std::vector<SymbolPair> pairs;
+        if (x.size() == 0)
+            return pairs;
         std::string prev_symbol = x[0];
         const int len = x.size();
         for (int i = 1; i < len; i++)
@@ -156,18 +182,47 @@ std::vector<std::string> Tokenizer::bpe(const std::vector<std::string>& symbols)
         }
         return pairs;
     };
-    std::vector<SymbolPair> pairs = get_pairs(symbols);
-    for (const auto& pair : pairs)
-    {
-        fmt::print("pair: <<{}> <{}>>, {} {}, ", pair.first, pair.second, symbol_to_id[pair.first],
-                   symbol_to_id[pair.second]);
-        if (pair_ranks.contains(pair))
-            fmt::println("rank {}", pair_ranks[pair]);
-        else
-            fmt::println("no rank");
-    }
 
-    return {};
+    // a b c db
+    // replace b c:
+    // 1. insert the parts before pair
+    // 2. insert the pair
+    // 3. insert the parts after pair
+    for (int i = 0; symbols.size() > 1; i++)
+    {
+        std::vector<SymbolPair> pairs = get_pairs(symbols);
+        fmt::print("{} iteration, ", i);
+        int min_rank = std::numeric_limits<int>::max();
+        std::optional<SymbolPair> min_pair = std::nullopt;
+        for (const auto& pair : pairs)
+        {
+            auto it = pair_ranks.find(pair);
+            if(it != pair_ranks.end())
+            {
+                int rank = pair_ranks[pair];
+                if (min_rank > rank)
+                {
+                    min_rank = rank;
+                    min_pair = pair;
+                }
+            }
+        }
+        if(!min_pair.has_value())
+        {
+            fmt::print("Absolutely no pairs. Early exit. ");
+            break;
+        }
+        fmt::print("min is <{}> <{}> with rank {}. ", min_pair->first, min_pair->second, min_rank);
+
+        std::vector<std::string> new_symbols;
+        auto first_position = std::find(symbols.begin(), symbols.end(), min_pair->first);
+        new_symbols.insert(new_symbols.end(), symbols.begin(), first_position);
+        new_symbols.push_back(min_pair->first + min_pair->second);
+        new_symbols.insert(new_symbols.end(), first_position + 2, symbols.end());
+        fmt::println("{} becomes {}", symbols, new_symbols);
+        symbols = new_symbols;
+    }
+    return symbols;
 }
 std::string Tokenizer::detokenize(const char) {}
 
@@ -184,7 +239,6 @@ std::vector<std::string> Tokenizer::pre_tokenize(const std::string& input)
 
     for (; it != end; it++)
     {
-        fmt::println("pushing {}", it->str());
         result.push_back(it->str());
     }
     return result;

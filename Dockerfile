@@ -16,5 +16,4 @@ RUN apt update && apt install -y \
 
 RUN apt install -y \
     libicu-dev \
-    libboost-regex-dev \
-    libboost-hash-dev
+    libboost-regex-dev
