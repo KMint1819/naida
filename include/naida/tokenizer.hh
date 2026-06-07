@@ -1,8 +1,8 @@
 #pragma once
 #include <filesystem>
 #include <vector>
-#include "boost/regex/icu.hpp"
-#include "boost/functional/hash.hpp"
+#include <boost/regex/icu.hpp>
+#include <boost/functional/hash.hpp>
 
 namespace fs = std::filesystem;
 namespace naida

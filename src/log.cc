@@ -1,5 +1,4 @@
 #include "naida/log.hh"
-#include "spdlog/common.h"
 #include <spdlog/logger.h>
 #include <memory>
 

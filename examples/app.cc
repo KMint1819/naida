@@ -1,7 +1,7 @@
 #include <cstdio>
 
-#include "fmt/format.h"
-#include "fmt/xchar.h"
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 #include "naida/block.hh"
 #include "naida/tokenizer.hh"
 #include "naida/weight_loader.hh"

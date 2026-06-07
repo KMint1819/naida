@@ -7,7 +7,7 @@
 #include <random>
 
 #include "naida/common.hh"
-#include "fmt/ranges.h"
+#include <fmt/ranges.h>
 
 namespace naida
 {
