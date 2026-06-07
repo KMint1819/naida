@@ -132,38 +132,25 @@ std::vector<uint32_t> Tokenizer::tokenize(const std::string& input)
     // 2.a Parse as bytes
     // 2.b Convert to unicode
     // 3. Start BPE
-    fmt::print("Tokenizing <{}>\n", input);
     std::vector<uint32_t> ans;
     auto pre_tokenized = pre_tokenize(input);
     for (const std::string s : pre_tokenized)
     {
-        fmt::print("Tokens for '{}': ", s);
         std::vector<std::string> symbols;
         for (const uint8_t ch : s)
         {
-            fmt::println("ch: {}", ch);
             std::string symbol = byte_to_symbol[ch];
             symbols.push_back(symbol);
         }
-        fmt::println("<{}>, ", symbols);
 
         std::vector<std::string> tokens = bpe(symbols);
-        fmt::println("After bpe: <{}>", tokens);
         for (const std::string token : tokens)
         {
             int id = static_cast<uint32_t>(symbol_to_id[token]);
-            fmt::print("{}, ", id);
 
             ans.push_back(id);
         }
-        fmt::println("Done. {}", ans);
     }
-    fmt::print("Final answer:");
-    for (const auto id : ans)
-    {
-        fmt::print("{}", id_to_symbol[id]);
-    }
-    fmt::println("");
     return ans;
 }
 std::vector<std::string> Tokenizer::bpe(std::vector<std::string> symbols)
@@ -191,13 +178,12 @@ std::vector<std::string> Tokenizer::bpe(std::vector<std::string> symbols)
     for (int i = 0; symbols.size() > 1; i++)
     {
         std::vector<SymbolPair> pairs = get_pairs(symbols);
-        fmt::print("{} iteration, ", i);
         int min_rank = std::numeric_limits<int>::max();
         std::optional<SymbolPair> min_pair = std::nullopt;
         for (const auto& pair : pairs)
         {
             auto it = pair_ranks.find(pair);
-            if(it != pair_ranks.end())
+            if (it != pair_ranks.end())
             {
                 int rank = pair_ranks[pair];
                 if (min_rank > rank)
@@ -207,19 +193,16 @@ std::vector<std::string> Tokenizer::bpe(std::vector<std::string> symbols)
                 }
             }
         }
-        if(!min_pair.has_value())
+        if (!min_pair.has_value())
         {
-            fmt::print("Absolutely no pairs. Early exit. ");
             break;
         }
-        fmt::print("min is <{}> <{}> with rank {}. ", min_pair->first, min_pair->second, min_rank);
 
         std::vector<std::string> new_symbols;
         auto first_position = std::find(symbols.begin(), symbols.end(), min_pair->first);
         new_symbols.insert(new_symbols.end(), symbols.begin(), first_position);
         new_symbols.push_back(min_pair->first + min_pair->second);
         new_symbols.insert(new_symbols.end(), first_position + 2, symbols.end());
-        fmt::println("{} becomes {}", symbols, new_symbols);
         symbols = new_symbols;
     }
     return symbols;

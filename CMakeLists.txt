@@ -4,8 +4,15 @@ project(naida
     LANGUAGES CXX CUDA
 )
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+option(CMAKE_BUILD_TYPE "Build type" Debug)
 
+# STREQUAL is case insensitive
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+  add_compile_definitions(NAIDA_LOG_LEVEL=NAIDA_LOG_LEVEL_TRACE)
+else()
+  add_compile_definitions(NAIDA_LOG_LEVEL=NAIDA_LOG_LEVEL_INFO)
+endif()
 
 # Avoid warning about DOWNLOAD_EXTRACT_TIMESTAMP in CMake 3.24:
 # See https://cmake.org/cmake/help/latest/policy/CMP0135.html#policy:CMP0135
@@ -25,6 +32,12 @@ FetchContent_Declare(
   GIT_TAG        e69e5f977d458f2650bb346dadf2ad30c5320281) # 10.2.1
 FetchContent_MakeAvailable(fmt)
 
+set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "" FORCE)
+FetchContent_Declare(
+    spdlog
+    URL https://github.com/gabime/spdlog/archive/refs/tags/v1.17.0.tar.gz)
+FetchContent_MakeAvailable(spdlog)
+
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
@@ -37,7 +50,6 @@ if(ENABLE_CUBLAS)
 endif()
 
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(examples)
 add_subdirectory(src)

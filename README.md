@@ -13,7 +13,7 @@ End to end LLM project that uses as less AI as possible, mostly for educational 
 hf download openai-community/gpt2 model.safetensors
 
 docker build . -t naida
-docker run --rm -it --gpus all -v $(pwd):/workspace naida bash
+docker run --rm -it --gpus all -v -t $(pwd):/workspace naida bash
 ```
 
 ## Build

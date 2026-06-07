@@ -5,7 +5,6 @@ namespace naida
 
 std::vector<std::byte> read_binary_file(const fs::path& path)
 {
-    printf("%d\n", fs::is_regular_file(path));
     std::ifstream inputFile(path, std::ios_base::binary);
 
     inputFile.seekg(0, std::ios::end);

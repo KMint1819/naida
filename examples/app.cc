@@ -5,6 +5,8 @@
 #include "naida/block.hh"
 #include "naida/tokenizer.hh"
 #include "naida/weight_loader.hh"
+#include "naida/log.hh"
+#include <spdlog/spdlog.h>
 
 class MyModel : public naida::Block
 {
@@ -49,6 +51,5 @@ int main()
     naida::Tokenizer tokenizer("../models/gpt2/tokenizer.json", "../models/gpt2/merges.txt");
     const std::string query = "I'm learning LLM. 臺灣123!";
     tokenizer.tokenize(query);
-    // fmt::print("{}\n", query.size());
     return 0;
 }
