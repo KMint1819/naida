@@ -44,3 +44,7 @@ cd naida/build
 
 ## Improvements
 - cuda graph
+
+## Useful Reads
+- [OpenAI implementation of BPE](https://github.com/openai/gpt-2/blob/master/src/encoder.py)
+- [Tech blog for C++20 ranges by Microsoft](https://devblogs.microsoft.com/cppblog/documentation-for-cpp20-ranges/)

@@ -1,4 +1,5 @@
 #include "naida/common.hh"
+#include <fstream>
 
 namespace naida
 {

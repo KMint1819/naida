@@ -214,7 +214,10 @@ std::vector<std::string> Tokenizer::bpe(std::vector<std::string> symbols)
     }
     return symbols;
 }
-std::string Tokenizer::detokenize(const char) {}
+std::string Tokenizer::detokenize(const char)
+{
+    return "";
+}
 
 std::vector<std::string> Tokenizer::pre_tokenize(const std::string& input)
 {
