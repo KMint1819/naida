@@ -6,7 +6,7 @@ namespace naida
 {
 static std::shared_ptr<spdlog::logger> init_logger()
 {
-    spdlog::set_pattern("[%H:%M:%S:%f] [Thread %t] [%l] %v");
+    spdlog::set_pattern("[%H:%M:%S:%f] [tid %t] [%l] %v");
     auto logger = spdlog::stdout_color_mt("naida");
     logger->set_level(spdlog::level::trace);
     return logger;

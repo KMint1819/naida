@@ -7,7 +7,6 @@
 namespace fs = std::filesystem;
 namespace naida
 {
-
 // Implementation of https://github.com/openai/gpt-2/blob/master/src/encoder.py
 class Tokenizer
 {

@@ -1,9 +1,11 @@
 #include "naida/common.hh"
 #include "naida/tokenizer.hh"
+#include "naida/log.hh"
 #include <fstream>
 #include <fmt/ranges.h>
 #include <fmt/format.h>
 #include <optional>
+#include <ranges>
 
 namespace
 {
@@ -133,6 +135,7 @@ std::vector<uint32_t> Tokenizer::tokenize(const std::string& input)
     // 3. Start BPE
     std::vector<uint32_t> ans;
     auto pre_tokenized = pre_tokenize(input);
+    NAIDA_TRACE("Tokenizing: <{}>", input);
     for (const std::string s : pre_tokenized)
     {
         std::vector<std::string> symbols;
@@ -146,10 +149,15 @@ std::vector<uint32_t> Tokenizer::tokenize(const std::string& input)
         for (const std::string token : tokens)
         {
             int id = static_cast<uint32_t>(symbol_to_id[token]);
-
             ans.push_back(id);
         }
     }
+    NAIDA_TRACE("Tokenized: <{}>", ans
+                                   | std::views::transform(
+                                   [this](const auto& id)
+                                   {
+                                       return id_to_symbol[id];
+                                   }));
     return ans;
 }
 std::vector<std::string> Tokenizer::bpe(std::vector<std::string> symbols)

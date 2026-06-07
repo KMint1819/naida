@@ -11,7 +11,6 @@ RUN apt update && apt install -y \
     build-essential \
     vim \
     gdb \
-    clangd \
     clang-format
 
 RUN apt install -y \
