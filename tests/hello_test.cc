@@ -2,13 +2,19 @@
 #include "naida/block.hh"
 #include "naida/tensor.hh"
 
+// Syntax: TEST(SUITE_NAME, test_mytest)
+// Suite means a group of tests that can share common routines/shared objects.
+
+// Ref: https://google.github.io/googletest/primer.html#simple-tests
+
+
 TEST(HelloTest, BasicAssertions)
 {
     EXPECT_STRNE("hello", "world");
-    EXPECT_EQ(7 * 6, 42);
+    EXPECT_EQ(7 * 6, 42) << "Seven times six is fourty two!";
 }
 
-TEST(E2E, test_identity)
+TEST(E2E, TestIdentity)
 {
     class MyModel : public naida::Block
     {
