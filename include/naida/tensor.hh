@@ -66,12 +66,13 @@ std::ostream& print_vector(std::ostream& os, const T* ptr, const Shape& shape, c
 
 std::vector<std::byte> random_weights(const Shape& shape, const DType& dtype);
 
-class Tensor
+class Tensor : public Formattable
 {
 public:
     Tensor(const std::vector<std::byte>& buf, const Shape& shape, const DType& dtype = DType::FLOAT32);
     Tensor(const Shape& shape, const DType& dtype = DType::FLOAT32);
 
+    virtual std::string to_string() const override;
     friend std::ostream& operator<<(std::ostream& os, const Tensor& tensor);
     Shape shape() const;
     const std::byte* data() const;
@@ -81,5 +82,6 @@ private:
     Shape shape_;
     DType dtype;
 };
+
 
 } // namespace naida

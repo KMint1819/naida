@@ -3,3 +3,5 @@ models/*
 
 build/
 .vscode/
+
+a.py

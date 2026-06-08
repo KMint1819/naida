@@ -13,9 +13,13 @@ Shape::Shape(const std::initializer_list<size_t>& list): vec(list)
 }
 
 Shape::iterator Shape::begin()
-{ return vec.begin(); }
+{
+    return vec.begin();
+}
 Shape::iterator Shape::end()
-{ return vec.end(); }
+{
+    return vec.end();
+}
 
 size_t Shape::operator[](int idx) const
 {
@@ -30,14 +34,16 @@ size_t Shape::operator[](int idx) const
 }
 
 size_t Shape::size() const
-{ return vec.size(); }
+{
+    return vec.size();
+}
 size_t Shape::total_size() const
-{ return sz; }
+{
+    return sz;
+}
 
 std::ostream& operator<<(std::ostream& os, const Shape& shape)
 {
-    fmt::print("shape vec size: {}\n", shape.vec.size());
-    fmt::print("shape vec: {}\n", shape.vec);
     os << fmt::format("{}", shape.vec);
     return os;
 }
@@ -65,7 +71,6 @@ std::string dtype_str(const DType& dtype)
 std::vector<std::byte> random_weights(const Shape& shape, const DType& dtype)
 {
     std::vector<std::byte> buf;
-    printf("%d\n", shape.total_size() * dtype_size(dtype));
     buf.reserve(shape.total_size() * dtype_size(dtype));
 
     static std::random_device dev;
@@ -84,20 +89,21 @@ Tensor::Tensor(const std::vector<std::byte>& buf, const Shape& shape, const DTyp
 }
 Tensor::Tensor(const Shape& shape, const DType& dtype): Tensor(random_weights(shape, dtype), shape, dtype) {}
 
-std::ostream& operator<<(std::ostream& os, const Tensor& tensor)
+std::string Tensor::to_string() const
 {
-    os << dtype_str(tensor.dtype) << " tensor (" << tensor.shape_ << ")\n";
+    std::stringstream ss;
+    ss << dtype_str(dtype) << " tensor (" << shape_ << ")\n";
 
-    if (tensor.dtype == DType::FLOAT32)
+    if (dtype == DType::FLOAT32)
     {
-        const float* ptr = reinterpret_cast<float*>(const_cast<std::byte*>(tensor.buf.data()));
+        const float* ptr = reinterpret_cast<float*>(const_cast<std::byte*>(buf.data()));
         size_t offset = 0;
-        print_vector(os, ptr, tensor.shape_, 0, offset);
+        print_vector(ss, ptr, shape_, 0, offset);
     }
     else
         throw std::runtime_error("Type is not supported");
 
-    return os;
+    return ss.str();
 }
 bool operator==(const Shape& lhs, const Shape& rhs)
 {
@@ -112,7 +118,11 @@ bool operator==(const Shape& lhs, const Shape& rhs)
     return true;
 }
 Shape Tensor::shape() const
-{ return shape_; };
+{
+    return shape_;
+};
 const std::byte* Tensor::data() const
-{ return buf.data(); }
+{
+    return buf.data();
+}
 } // namespace naida

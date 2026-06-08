@@ -15,6 +15,7 @@ public:
     // virtual std::vector<std::byte> dump_weigths();
     virtual ~Block() {}
     virtual std::vector<Tensor> forward(const std::vector<Tensor>& inputs) = 0;
+    void load_weights(const std::string& prefix, std::unordered_map<std::string, std::vector<std::byte>>&);
 
 protected:
     void register_weight(const std::string& str, std::unique_ptr<Tensor> tensor);
@@ -28,6 +29,15 @@ class Identity final : public Block
 public:
     explicit Identity();
     ~Identity() override {};
+
+    std::vector<Tensor> forward(const std::vector<Tensor>& inputs) override;
+};
+
+class Embedding final : public Block
+{
+public:
+    explicit Embedding();
+    ~Embedding() override {};
 
     std::vector<Tensor> forward(const std::vector<Tensor>& inputs) override;
 };

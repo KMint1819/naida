@@ -5,7 +5,10 @@ project(naida
 )
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-option(CMAKE_BUILD_TYPE "Build type" Debug)
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
 
 # STREQUAL is case insensitive
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
@@ -28,8 +31,7 @@ FetchContent_MakeAvailable(json)
 
 FetchContent_Declare(
   fmt
-  GIT_REPOSITORY https://github.com/fmtlib/fmt
-  GIT_TAG        e69e5f977d458f2650bb346dadf2ad30c5320281) # 10.2.1
+  URL https://github.com/fmtlib/fmt/archive/refs/tags/12.1.0.tar.gz)
 FetchContent_MakeAvailable(fmt)
 
 set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "" FORCE)
