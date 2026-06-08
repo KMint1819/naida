@@ -6,18 +6,21 @@
 #include "naida/tokenizer.hh"
 #include "naida/weight_loader.hh"
 #include "naida/log.hh"
+#include "nlohmann/json_fwd.hpp"
 #include <spdlog/spdlog.h>
+#include <nlohmann/json.hpp>
 
 class MyModel : public naida::Block
 {
 public:
-    MyModel(int d)
+    MyModel(const int d): naida::Block("")
     {
+
         auto gemm = std::make_unique<naida::Gemm>(d, d);
         this->register_block("gemm0", std::move(gemm));
     }
     virtual ~MyModel() {}
-    virtual std::vector<naida::Tensor> forward(const std::vector<naida::Tensor> &inputs)
+    virtual std::vector<naida::Tensor> forward(const std::vector<naida::Tensor>& inputs)
     {
         return blocks["gemm0"]->forward(inputs);
     }
@@ -32,6 +35,10 @@ void try_forward()
     MyModel model(3);
     naida::Tensor out = model.forward({ tensor })[0];
     NAIDA_INFO("Out:{}\n", out);
+}
+void try_block()
+{
+    naida::AttnBlock block(768, 768 * 3, "h.0");
 }
 int main()
 {

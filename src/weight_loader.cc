@@ -5,10 +5,6 @@
 #include <fstream>
 #include <memory>
 #include <cstring>
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-
 
 namespace naida
 {
@@ -27,8 +23,15 @@ void WeightLoader::load_safe_tensors(const fs::path &path)
 
     std::memcpy(json_buf.data(), buf.data() + 8, len_header);
 
-    auto js = json::parse(json_buf);
-    NAIDA_TRACE("naida {}", js.dump());
+    storage = json::parse(json_buf);
+    for (auto &[k, v] : storage.items())
+    {
+        if (k.starts_with("h.0"))
+        {
+            NAIDA_TRACE("{}: {}", k, v.dump(4));
+        }
+    }
+    // NAIDA_INFO("{}", storage.dump(4));
 }
 
 // .safetensors:

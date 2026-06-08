@@ -19,14 +19,16 @@ TEST(E2E, TestIdentity)
     class MyModel : public naida::Block
     {
     public:
-        MyModel()
+        MyModel(): naida::Block("TestModel")
         {
             auto identity = std::make_unique<naida::Identity>();
             this->register_block("identity", std::move(identity));
         }
         virtual ~MyModel() {}
         virtual std::vector<naida::Tensor> forward(const std::vector<naida::Tensor>& inputs)
-        { return blocks["identity"]->forward(inputs); }
+        {
+            return blocks["identity"]->forward(inputs);
+        }
     };
 
     auto dtype = naida::DType::FLOAT32;

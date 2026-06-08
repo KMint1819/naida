@@ -2,6 +2,9 @@
 #include <filesystem>
 #include <unordered_map>
 #include <vector>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 namespace fs = std::filesystem;
 
@@ -16,6 +19,6 @@ public:
 
 private:
     const fs::path weight_path;
-    std::unordered_map<std::string, std::vector<std::byte>> storage;
+    json storage;
 };
 } // namespace naida
