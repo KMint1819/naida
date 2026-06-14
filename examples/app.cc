@@ -4,7 +4,7 @@
 #include <fmt/xchar.h>
 #include "naida/block.hh"
 #include "naida/tokenizer.hh"
-#include "naida/weight_loader.hh"
+#include "naida/loader.hh"
 #include "naida/log.hh"
 #include "nlohmann/json_fwd.hpp"
 #include <spdlog/spdlog.h>
@@ -25,10 +25,7 @@ public:
         return blocks["gemm0"]->forward(inputs);
     }
 };
-void try_weight_loader()
-{
-    naida::WeightLoader wl("../models/gpt2/model.safetensors");
-}
+void try_weight_loader() {}
 void try_forward()
 {
     naida::Tensor tensor(naida::Shape { 2, 3 });
@@ -38,6 +35,7 @@ void try_forward()
 }
 void try_block()
 {
+    naida::load_safe_tensors("../models/gpt2/model.safetensors");
     naida::AttnBlock block(768, 768 * 3, "h.0");
 }
 int main()
@@ -45,7 +43,7 @@ int main()
     // naida::Tokenizer tokenizer("../models/gpt2/tokenizer.json", "../models/gpt2/merges.txt");
     // const std::string query = "I'm learning LLM. 臺灣123!";
     // tokenizer.tokenize(query);
-    try_weight_loader();
+    try_block();
 
     return 0;
 }

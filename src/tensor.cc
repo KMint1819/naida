@@ -1,16 +1,10 @@
 #include "naida/tensor.hh"
+#include <initializer_list>
+
 
 namespace naida
 {
-
-Shape::Shape(const std::initializer_list<size_t>& list): vec(list)
-{
-    size_t tmp = vec.size() > 0 ? 1 : 0;
-
-    for (const size_t sz : vec)
-        tmp *= sz;
-    sz = tmp;
-}
+Shape::Shape(const std::initializer_list<size_t>& list): Shape(list.begin(), list.end()) {}
 
 Shape::iterator Shape::begin()
 {
@@ -83,11 +77,37 @@ std::vector<std::byte> random_weights(const Shape& shape, const DType& dtype)
     return buf;
 }
 
-Tensor::Tensor(const std::vector<std::byte>& buf, const Shape& shape, const DType& dtype)
-    : buf(buf), shape_(shape), dtype(dtype)
+Tensor::Tensor(std::unique_ptr<std::vector<std::byte>> buf, const Shape& shape, const DType& dtype)
+    : buf(std::move(buf)), shape_(shape), dtype(dtype)
 {
 }
-Tensor::Tensor(const Shape& shape, const DType& dtype): Tensor(random_weights(shape, dtype), shape, dtype) {}
+Tensor::Tensor(const Shape& shape, const DType& dtype)
+    : Tensor(std::make_unique<std::vector<std::byte>>(random_weights(shape, dtype)), shape, dtype)
+{
+}
+
+Tensor::Tensor(const Tensor& rhs): shape_(rhs.shape_), dtype(rhs.dtype)
+{
+    std::vector<std::byte> tmp;
+    buf.reset();
+    std::copy(rhs.buf->begin(), rhs.buf->end(), buf->begin());
+}
+Tensor& Tensor::operator=(const Tensor& rhs)
+{
+    shape_ = rhs.shape();
+    dtype = rhs.dtype;
+    std::vector<std::byte> tmp;
+    buf.reset();
+    std::copy(rhs.buf->begin(), rhs.buf->end(), buf->begin());
+    return *this;
+}
+
+void Tensor::set_buffer(std::unique_ptr<std::vector<std::byte>> rhs_buf, const DType rhs_dtype, const Shape rhs_shape)
+{
+    buf = std::move(rhs_buf);
+    dtype = rhs_dtype;
+    shape_ = rhs_shape;
+}
 
 std::string Tensor::to_string() const
 {
@@ -96,7 +116,7 @@ std::string Tensor::to_string() const
 
     if (dtype == DType::FLOAT32)
     {
-        const float* ptr = reinterpret_cast<float*>(const_cast<std::byte*>(buf.data()));
+        const float* ptr = reinterpret_cast<float*>(const_cast<std::byte*>(buf->data()));
         size_t offset = 0;
         print_vector(ss, ptr, shape_, 0, offset);
     }
@@ -119,10 +139,10 @@ bool operator==(const Shape& lhs, const Shape& rhs)
 }
 Shape Tensor::shape() const
 {
-    return shape_;
+    return Shape { shape_ };
 };
 const std::byte* Tensor::data() const
 {
-    return buf.data();
+    return buf->data();
 }
 } // namespace naida

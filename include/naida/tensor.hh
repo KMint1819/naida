@@ -5,6 +5,7 @@
 #include <ostream>
 #include <span>
 #include <random>
+#include <memory>
 
 #include "naida/common.hh"
 #include <fmt/ranges.h>
@@ -18,7 +19,18 @@ public:
     using iterator = std::vector<size_t>::iterator;
     using const_iterator = std::vector<size_t>::const_iterator;
 
+    template<class It>
+    explicit Shape(It start, It end): vec(start, end)
+    {
+        size_t tmp = vec.size() > 0 ? 1 : 0;
+
+        for (const size_t sz : vec)
+            tmp *= sz;
+        sz = tmp;
+    }
     explicit Shape(const std::initializer_list<size_t>& list);
+    explicit Shape(const Shape&) = default;
+    explicit Shape(Shape&) = default;
 
     iterator begin();
     iterator end();
@@ -69,16 +81,19 @@ std::vector<std::byte> random_weights(const Shape& shape, const DType& dtype);
 class Tensor : public Formattable
 {
 public:
-    Tensor(const std::vector<std::byte>& buf, const Shape& shape, const DType& dtype = DType::FLOAT32);
+    Tensor(std::unique_ptr<std::vector<std::byte>>, const Shape&, const DType& dtype = DType::FLOAT32);
     Tensor(const Shape& shape, const DType& dtype = DType::FLOAT32);
+    Tensor(const Tensor&);
+    Tensor& operator=(const Tensor&);
 
+    void set_buffer(std::unique_ptr<std::vector<std::byte>>, const DType, const Shape);
     virtual std::string to_string() const override;
     friend std::ostream& operator<<(std::ostream& os, const Tensor& tensor);
     Shape shape() const;
     const std::byte* data() const;
 
 private:
-    std::vector<std::byte> buf;
+    std::unique_ptr<std::vector<std::byte>> buf;
     Shape shape_;
     DType dtype;
 };

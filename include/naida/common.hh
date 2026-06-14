@@ -14,7 +14,8 @@ namespace fs = std::filesystem;
 
 namespace naida
 {
-std::vector<std::byte> read_binary_file(const fs::path&);
+std::vector<std::byte> read_binary_file(const fs::path& path);
+std::vector<std::byte> read_binary_file(const fs::path& path, const size_t offset, const size_t length);
 
 inline float get_random_number()
 {

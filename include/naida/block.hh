@@ -1,8 +1,10 @@
 #pragma once
+#include <functional>
 #include <string>
-#include "naida/weight_loader.hh"
-#include "naida/tensor.hh"
 #include <unordered_map>
+#include <memory>
+#include "naida/tensor.hh"
+
 
 namespace naida
 {
@@ -12,7 +14,9 @@ public:
     Block(const std::string& name);
     virtual ~Block() {}
     virtual std::vector<Tensor> forward(const std::vector<Tensor>& inputs);
-    // void load_weights(const std::string& prefix, json&);
+    void load_weights(const std::string& prefix, json&,
+                      std::function<std::unique_ptr<std::vector<std::byte>>(uint64_t, uint64_t)> load_buffer);
+
 
 protected:
     std::string name;
@@ -52,7 +56,6 @@ class AttnBlock final : public Block
 {
 public:
     AttnBlock(const int dh, const int h, const std::string& name = "attn");
-    std::vector<naida::Tensor> forward(const std::vector<naida::Tensor>& xs);
-    void load_weights(const std::string& prefix, json js);
+    std::vector<naida::Tensor> forward(const std::vector<naida::Tensor>&);
 };
 } // namespace naida

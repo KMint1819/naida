@@ -1,10 +1,10 @@
 add_library(naida
-    weight_loader.cc
-    common.cc
     block.cc
+    common.cc
+    log.cc
     tensor.cc
     tokenizer.cc
-    log.cc
+    loader.cc
 )
 
 # uc: common libs for other icu components

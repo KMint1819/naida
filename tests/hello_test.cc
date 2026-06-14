@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <vector>
 #include "naida/block.hh"
 #include "naida/tensor.hh"
 
@@ -35,7 +36,7 @@ TEST(E2E, TestIdentity)
     naida::Tensor tensor(naida::Shape { 2, 3 }, dtype);
 
     MyModel model;
-    std::vector<naida::Tensor> outs = model.forward({ tensor });
+    std::vector<naida::Tensor> outs = model.forward(std::vector<naida::Tensor> { tensor });
     EXPECT_EQ(outs.size(), 1);
 
     naida::Tensor& out = outs[0];
