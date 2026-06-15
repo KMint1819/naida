@@ -7,40 +7,29 @@
 #include <fstream>
 #include <iterator>
 #include <memory>
+#include <ranges>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace naida
 {
-WeightLoader::WeightLoader(const fs::path &path): weight_path(path)
+namespace
 {
-    load_safe_tensors(path);
-}
-void WeightLoader::load_safe_tensors(const fs::path &path) {}
-
-// .safetensors:
-// 8 bytes: uint64: size of header
-// N bytes: json header
-// rest of file: raw data
-std::vector<std::byte> WeightLoader::load_buffer(std::basic_ifstream<std::byte> &in, const uint64_t start,
-                                                 const uint64_t end)
-{
-    uint64_t num_bytes = end - start;
-    in.seekg(start);
-    std::vector<std::byte> res(std::istreambuf_iterator<std::byte>(in), {});
-    return res;
-}
-
-static DType parse_dtype(const std::string &s)
+DType parse_dtype(const std::string &s)
 {
     if (s == "F32")
         return DType::FLOAT32;
 
     throw std::runtime_error(fmt::format("Unknown dtype: {}", s));
 }
-
-std::unordered_map<std::string, Tensor> load_safe_tensors(const fs::path &path)
+} // namespace
+WeightLoader::WeightLoader(const fs::path &path)
+    : weight_path(path), storage(std::make_unique<std::unordered_map<std::string, std::unique_ptr<Tensor>>>())
+{
+    load_safe_tensors(path);
+}
+void WeightLoader::load_safe_tensors(const fs::path &path)
 {
     std::vector<std::byte> buf = read_binary_file(path);
 
@@ -52,9 +41,8 @@ std::unordered_map<std::string, Tensor> load_safe_tensors(const fs::path &path)
 
 
     auto buffer_begin = buf.begin() + 8 + len_header;
-    json storage = json::parse(json_buf);
-    std::unordered_map<std::string, std::unique_ptr<Tensor>> map;
-    for (auto &[k, v] : storage.items())
+    json js = json::parse(json_buf);
+    for (auto &[k, v] : js.items())
     {
         if (k == "__metadata__")
             continue;
@@ -71,22 +59,24 @@ std::unordered_map<std::string, Tensor> load_safe_tensors(const fs::path &path)
 
         auto tensor = std::make_unique<Tensor>(std::move(tensor_buffer), shape, dtype);
 
-        map.insert({ k, std::move(tensor) });
-    }
-
-    for (const auto &[k, v] : map)
-    {
-        NAIDA_INFO("{}: ", k);
+        storage->insert({ k, std::move(tensor) });
     }
 }
-// void WeightLoader::traverse_assign(Block &model)
-// {
-//     std::basic_ifstream<std::byte> in(weight_path);
-//     model.load_weights("", storage,
-//                        [this, &in](uint64_t start, uint64_t end)
-//                        {
-//                            std::vector<std::byte> buf = WeightLoader::load_buffer(in, start, end);
-//                            return std::make_unique<std::vector<std::byte>>(buf);
-//                        });
-// }
+void WeightLoader::assign_to_block(Block &block)
+{
+    block.load_weights("", storage.get());
+
+    // after loading, storage should be empty
+    if (!storage->empty())
+    {
+        throw std::runtime_error(
+        fmt::format("The following keys are not found in the model: {}", fmt::join(*storage
+                                                                                   | std::views::transform(
+                                                                                   [this](const auto &pair)
+                                                                                   {
+                                                                                       return pair.first;
+                                                                                   }),
+                                                                                   ", ")));
+    }
+}
 } // namespace naida

@@ -10,9 +10,9 @@ namespace naida
 Block::Block(const std::string& name): name(name) {}
 std::vector<Tensor> Block::forward(const std::vector<Tensor>& inputs) {};
 
-void Block::load_weights(const std::string& prefix, json& js,
-                         std::function<std::unique_ptr<std::vector<std::byte>>(uint64_t, uint64_t)> load_buffer)
+void Block::load_weights(const std::string& prefix, std::unordered_map<std::string, std::unique_ptr<Tensor>>* map)
 {
+    return;
 }
 void Block::register_weight(const std::string& str, std::unique_ptr<Tensor> tensor)
 {

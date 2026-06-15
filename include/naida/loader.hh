@@ -6,6 +6,7 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 #include "naida/tensor.hh"
+#include "naida/block.hh"
 
 using json = nlohmann::json;
 
@@ -18,15 +19,10 @@ class WeightLoader
 public:
     explicit WeightLoader(const fs::path &);
     void load_safe_tensors(const fs::path &);
-
-public:
-    static std::vector<std::byte> load_buffer(std::basic_ifstream<std::byte> &in, const uint64_t start,
-                                              const uint64_t end);
+    void assign_to_block(Block &block);
 
 private:
     const fs::path weight_path;
-    json storage;
+    std::unique_ptr<std::unordered_map<std::string, std::unique_ptr<Tensor>>> storage;
 };
-
-std::unordered_map<std::string, Tensor> load_safe_tensors(const fs::path &);
 } // namespace naida

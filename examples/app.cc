@@ -35,8 +35,9 @@ void try_forward()
 }
 void try_block()
 {
-    naida::load_safe_tensors("../models/gpt2/model.safetensors");
-    naida::AttnBlock block(768, 768 * 3, "h.0");
+    naida::WeightLoader loader("/workspace/models/gpt2/model.safetensors");
+    naida::AttnBlock block(768, 3, "h.0");
+    loader.assign_to_block(block);
 }
 int main()
 {

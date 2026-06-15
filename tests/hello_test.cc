@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <vector>
 #include "naida/block.hh"
+#include "naida/loader.hh"
 #include "naida/tensor.hh"
 
 // Syntax: TEST(SUITE_NAME, test_mytest)
