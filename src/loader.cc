@@ -62,12 +62,12 @@ void WeightLoader::load_safe_tensors(const fs::path &path)
         storage->insert({ k, std::move(tensor) });
     }
 }
-void WeightLoader::assign_to_block(Block &block)
+void WeightLoader::assign_to_block(Block &block, bool load_all)
 {
     block.load_weights("", storage.get());
 
     // after loading, storage should be empty
-    if (!storage->empty())
+    if (!storage->empty() && load_all)
     {
         throw std::runtime_error(
         fmt::format("The following keys are not found in the model: {}", fmt::join(*storage

@@ -37,7 +37,7 @@ void try_block()
 {
     naida::WeightLoader loader("/workspace/models/gpt2/model.safetensors");
     naida::AttnBlock block(768, 3, "h.0");
-    loader.assign_to_block(block);
+    loader.assign_to_block(block, false);
 }
 int main()
 {

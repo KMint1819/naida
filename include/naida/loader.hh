@@ -19,7 +19,7 @@ class WeightLoader
 public:
     explicit WeightLoader(const fs::path &);
     void load_safe_tensors(const fs::path &);
-    void assign_to_block(Block &block);
+    void assign_to_block(Block &block, bool load_all = true);
 
 private:
     const fs::path weight_path;
