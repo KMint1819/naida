@@ -14,7 +14,7 @@ public:
     Block(const std::string& name);
     virtual ~Block() {}
     virtual std::vector<Tensor> forward(const std::vector<Tensor>& inputs);
-    void load_weights(const std::string& prefix, std::unordered_map<std::string, std::unique_ptr<Tensor>>* map);
+    void load_weights(const std::string& prefix, std::unordered_map<std::string, std::unique_ptr<Tensor>>& map);
 
 
 protected:

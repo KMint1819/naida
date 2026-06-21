@@ -10,8 +10,27 @@ namespace naida
 Block::Block(const std::string& name): name(name) {}
 std::vector<Tensor> Block::forward(const std::vector<Tensor>& inputs) {};
 
-void Block::load_weights(const std::string& prefix, std::unordered_map<std::string, std::unique_ptr<Tensor>>* map)
+void Block::load_weights(const std::string& prefix, std::unordered_map<std::string, std::unique_ptr<Tensor>>& map)
 {
+    // iterate weights, load weights, remove from map.
+    for (auto& [weight_name, weight] : weights)
+    {
+        auto it = map.find(weight_name);
+        if (it != map.end())
+        {
+            // retrieve
+            weight = std::move(weight);
+
+            // remove
+            map.erase(it);
+        }
+    }
+
+    // iterate blocks, sub-block::load_weights()
+    for (auto& [key, block] : blocks)
+    {
+        block->load_weights(fmt::format("{}.{}", prefix, name), map);
+    }
     return;
 }
 void Block::register_weight(const std::string& str, std::unique_ptr<Tensor> tensor)

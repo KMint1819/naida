@@ -25,7 +25,7 @@ DType parse_dtype(const std::string &s)
 }
 } // namespace
 WeightLoader::WeightLoader(const fs::path &path)
-    : weight_path(path), storage(std::make_unique<std::unordered_map<std::string, std::unique_ptr<Tensor>>>())
+    : weight_path(path), storage(std::unordered_map<std::string, std::unique_ptr<Tensor>>())
 {
     load_safe_tensors(path);
 }
@@ -59,18 +59,18 @@ void WeightLoader::load_safe_tensors(const fs::path &path)
 
         auto tensor = std::make_unique<Tensor>(std::move(tensor_buffer), shape, dtype);
 
-        storage->insert({ k, std::move(tensor) });
+        storage.insert({ k, std::move(tensor) });
     }
 }
 void WeightLoader::assign_to_block(Block &block, bool load_all)
 {
-    block.load_weights("", storage.get());
+    block.load_weights("", storage);
 
     // after loading, storage should be empty
-    if (!storage->empty() && load_all)
+    if (!storage.empty() && load_all)
     {
         throw std::runtime_error(
-        fmt::format("The following keys are not found in the model: {}", fmt::join(*storage
+        fmt::format("The following keys are not found in the model: {}", fmt::join(storage
                                                                                    | std::views::transform(
                                                                                    [this](const auto &pair)
                                                                                    {

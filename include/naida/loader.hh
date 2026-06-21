@@ -23,6 +23,6 @@ public:
 
 private:
     const fs::path weight_path;
-    std::unique_ptr<std::unordered_map<std::string, std::unique_ptr<Tensor>>> storage;
+    std::unordered_map<std::string, std::unique_ptr<Tensor>> storage;
 };
 } // namespace naida
