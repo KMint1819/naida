@@ -5,6 +5,7 @@ add_library(naida
     tensor.cc
     tokenizer.cc
     loader.cc
+    memory.cc
 )
 
 # uc: common libs for other icu components
@@ -12,6 +13,7 @@ add_library(naida
 # see also https://cmake.org/cmake/help/latest/module/FindICU.html
 find_package(Boost REQUIRED COMPONENTS regex)
 find_package(ICU REQUIRED COMPONENTS uc i18n)
+find_package(CUDAToolkit REQUIRED)
 
 target_include_directories(naida 
     PRIVATE ${PROJECT_SOURCE_DIR}/include
@@ -22,4 +24,5 @@ target_link_libraries(naida
     PUBLIC Boost::regex
     PUBLIC ${ICU_LIBRARIES}
     PUBLIC spdlog::spdlog
+    PUBLIC CUDA::cudart
 )

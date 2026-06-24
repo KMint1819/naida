@@ -1,9 +1,7 @@
 #pragma once
 #include <filesystem>
-#include <istream>
 #include <string>
 #include <unordered_map>
-#include <vector>
 #include <nlohmann/json.hpp>
 #include "naida/tensor.hh"
 #include "naida/block.hh"

@@ -1,13 +1,12 @@
 #pragma once
 #include <vector>
-#include <cstdint>
 #include <string>
 #include <ostream>
 #include <span>
-#include <random>
 #include <memory>
 
 #include "naida/common.hh"
+#include "naida/memory.hh"
 #include <fmt/ranges.h>
 
 namespace naida
@@ -36,7 +35,10 @@ public:
     iterator end();
 
     size_t operator[](int idx) const;
+
+    // Returns size of the shape vector (e.g for shape [2, 3], size is 2)
     size_t size() const;
+    // Returns total size of the shape vector (e.g for shape [2, 3], size is 6)
     size_t total_size() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Shape& shape);
@@ -47,14 +49,12 @@ private:
     size_t sz;
 };
 
+
 enum class DType
 {
     FLOAT32 = 1
 };
 
-size_t dtype_size(const DType dtype);
-
-std::string dtype_str(const DType& dtype);
 
 template<typename T>
 std::ostream& print_vector(std::ostream& os, const T* ptr, const Shape& shape, const size_t shape_idx, size_t& offset)
@@ -76,27 +76,28 @@ std::ostream& print_vector(std::ostream& os, const T* ptr, const Shape& shape, c
     return os;
 }
 
-std::vector<std::byte> random_weights(const Shape& shape, const DType& dtype);
 
 class Tensor : public Formattable
 {
 public:
-    Tensor(std::unique_ptr<std::vector<std::byte>>, const Shape&, const DType& dtype = DType::FLOAT32);
-    Tensor(const Shape& shape, const DType& dtype = DType::FLOAT32);
-    Tensor(const Tensor&);
-    Tensor& operator=(const Tensor&);
+    static std::unique_ptr<Tensor> zeros(const Shape& shape, const DType dtype = DType::FLOAT32,
+                                         const Silicon sil = Silicon::CPU);
+    // CPU only
+    Tensor(std::unique_ptr<std::byte[]> bytes, const Shape&, const DType dtype = DType::FLOAT32);
 
-    void set_buffer(std::unique_ptr<std::vector<std::byte>>, const DType, const Shape);
+    // required for std::copy
+    Tensor(const Tensor& rhs);
+    Tensor& operator=(const Tensor& rhs);
+    Tensor(std::unique_ptr<Blob>, const Shape& shape, const DType dtype = DType::FLOAT32);
     virtual std::string to_string() const override;
     friend std::ostream& operator<<(std::ostream& os, const Tensor& tensor);
     Shape shape() const;
+    Silicon silicon() const;
     const std::byte* data() const;
 
 private:
-    std::unique_ptr<std::vector<std::byte>> buf;
+    std::unique_ptr<Blob> blob;
     Shape shape_;
-    DType dtype;
+    DType dtype_;
 };
-
-
 } // namespace naida

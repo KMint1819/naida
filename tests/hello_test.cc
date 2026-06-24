@@ -34,20 +34,20 @@ TEST(E2E, TestIdentity)
     };
 
     auto dtype = naida::DType::FLOAT32;
-    naida::Tensor tensor(naida::Shape { 2, 3 }, dtype);
+    auto tensor = naida::Tensor::zeros(naida::Shape { 2, 3 }, dtype);
 
     MyModel model;
-    std::vector<naida::Tensor> outs = model.forward(std::vector<naida::Tensor> { tensor });
+    std::vector<naida::Tensor> outs = model.forward({ *tensor });
     EXPECT_EQ(outs.size(), 1);
 
     naida::Tensor& out = outs[0];
 
-    EXPECT_EQ(tensor.shape(), out.shape());
-    const std::byte* in_byte = tensor.data();
+    EXPECT_EQ(tensor->shape(), out.shape());
+    const std::byte* in_byte = tensor->data();
     const std::byte* out_byte = outs[0].data();
 
-    for (int i = 0; i < tensor.shape().total_size(); i++)
+    for (int i = 0; i < tensor->shape().total_size(); i++)
     {
-        EXPECT_EQ(tensor.data()[i], out.data()[i]);
+        EXPECT_EQ(tensor->data()[i], out.data()[i]);
     }
 }

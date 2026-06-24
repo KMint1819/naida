@@ -3,10 +3,8 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 #include "naida/block.hh"
-#include "naida/tokenizer.hh"
+#include "naida/tensor.hh"
 #include "naida/loader.hh"
-#include "naida/log.hh"
-#include "nlohmann/json_fwd.hpp"
 #include <spdlog/spdlog.h>
 #include <nlohmann/json.hpp>
 
@@ -28,10 +26,10 @@ public:
 void try_weight_loader() {}
 void try_forward()
 {
-    naida::Tensor tensor(naida::Shape { 2, 3 });
+    auto tensor = naida::Tensor::zeros(naida::Shape { 2, 3 });
     MyModel model(3);
-    naida::Tensor out = model.forward({ tensor })[0];
-    NAIDA_INFO("Out:{}\n", out);
+    // naida::Tensor out = model.forward({ *tensor })[0];
+    // NAIDA_INFO("Out:{}\n", out);
 }
 void try_block()
 {

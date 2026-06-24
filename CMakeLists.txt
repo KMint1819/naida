@@ -31,7 +31,7 @@ FetchContent_MakeAvailable(json)
 
 FetchContent_Declare(
   fmt
-  URL https://github.com/fmtlib/fmt/archive/refs/tags/12.1.0.tar.gz)
+  URL https://github.com/fmtlib/fmt/releases/download/12.1.0/fmt-12.1.0.zip)
 FetchContent_MakeAvailable(fmt)
 
 set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "" FORCE)

@@ -12,3 +12,7 @@ target_include_directories(app
     PRIVATE ${PROJECT_SOURCE_DIR}/include
     # PRIVATE ${PROJECT_SOURCE_DIR}/3rdparty
 )
+
+add_executable(scratch
+    scratch.cu
+)

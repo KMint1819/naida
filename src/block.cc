@@ -1,7 +1,5 @@
 #include <string>
-#include "naida/log.hh"
 #include "naida/block.hh"
-#include "naida/loader.hh"
 #include "naida/tensor.hh"
 #include <unordered_map>
 
@@ -54,7 +52,7 @@ std::vector<Tensor> Identity::forward(const std::vector<Tensor>& inputs)
 Gemm::Gemm(size_t in_dims, size_t out_dims, DType dtype, const std::string& name): Block(name)
 {
     std::vector<size_t> shape = { in_dims, out_dims };
-    auto weight = std::make_unique<Tensor>(Shape { in_dims, out_dims }, dtype);
+    auto weight = Tensor::zeros(Shape { in_dims, out_dims }, dtype);
     register_weight("weight", std::move(weight));
 }
 

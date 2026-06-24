@@ -1,11 +1,7 @@
 #include "naida/loader.hh"
 #include "naida/common.hh"
-#include "naida/log.hh"
 #include "naida/tensor.hh"
 
-#include <functional>
-#include <fstream>
-#include <iterator>
 #include <memory>
 #include <ranges>
 #include <stdexcept>
@@ -50,14 +46,14 @@ void WeightLoader::load_safe_tensors(const fs::path &path)
         uint64_t data_end = v["data_offsets"][1];
         DType dtype = parse_dtype(v["dtype"]);
 
-        std::vector<size_t> sha(v["shape"]);
-        Shape shape(sha.begin(), sha.end());
+        std::vector<size_t> shape_buffer(v["shape"]);
+        Shape shape(shape_buffer.begin(), shape_buffer.end());
 
+        auto tensor_buffer = std::make_unique<std::byte[]>(data_end - data_start);
+        std::copy(buffer_begin + data_start, buffer_begin + data_end, tensor_buffer.get());
 
-        auto tensor_buffer = std::make_unique<std::vector<std::byte>>(data_end - data_start);
-        std::copy(buffer_begin + data_start, buffer_begin + data_end, tensor_buffer->begin());
-
-        auto tensor = std::make_unique<Tensor>(std::move(tensor_buffer), shape, dtype);
+        auto blob = Blob::adopt(tensor_buffer.release(), data_end - data_start, Silicon::CPU);
+        auto tensor = std::make_unique<Tensor>(std::move(blob), shape, dtype);
 
         storage.insert({ k, std::move(tensor) });
     }
